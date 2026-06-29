@@ -1,0 +1,10 @@
+# Rendered media (large, regenerate from the scripts)
+*.png
+*.gif
+*.mp4
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
