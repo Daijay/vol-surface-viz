@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Volatility Surface</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        background: #000;
+        overflow: hidden;
+        font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+        color: rgba(255, 255, 255, 0.6);
+      }
+      #app { position: fixed; inset: 0; }
+      canvas { display: block; }
+      .overlay {
+        position: fixed;
+        left: 24px;
+        bottom: 22px;
+        pointer-events: none;
+        user-select: none;
+      }
+      .overlay h1 {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.82);
+      }
+      .overlay p {
+        margin-top: 6px;
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        color: rgba(255, 255, 255, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div class="overlay">
+      <h1>Implied Volatility Surface</h1>
+      <p>drag to orbit &middot; scroll to zoom</p>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
