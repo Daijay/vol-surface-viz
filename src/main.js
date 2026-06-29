@@ -136,7 +136,15 @@ geom.computeVertexNormals();
 
 const surface = new THREE.Mesh(
   geom,
-  new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.DoubleSide })
+  new THREE.MeshBasicMaterial({
+    vertexColors: true,
+    side: THREE.DoubleSide,
+    // push surface fragments back so the grid lines win the depth test
+    // (stops the wireframe flickering / z-fighting during rotation)
+    polygonOffset: true,
+    polygonOffsetFactor: 1,
+    polygonOffsetUnits: 1,
+  })
 );
 root.add(surface);
 
