@@ -98,8 +98,9 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 app.appendChild(renderer.domElement);
 
 const root = new THREE.Group();
-// center the surface vertically inside the view
-root.position.y = -Y_MAX / 2;
+// center the (taller) cage vertically inside the view
+const CAGE_TOP = Y_MAX + 4.5;
+root.position.y = -CAGE_TOP / 2;
 scene.add(root);
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -190,8 +191,8 @@ function buildScaffold(x0, x1, y0, y1, z0, z1, divs) {
   );
 }
 const H = SIZE / 2;
-const cageTop = Y_MAX + 0.4;
-root.add(buildScaffold(-H, H, 0, cageTop, -H, H, 6));
+const cageTop = CAGE_TOP;           // taller scaffold, lots of grid headroom
+root.add(buildScaffold(-H, H, 0, cageTop, -H, H, 9));
 
 // ===========================================================================
 // floating market data points (glowing dots at realistic coordinates)
@@ -282,7 +283,7 @@ addLabel(`${TAU_MIN}y`, H + 0.7, -0.5, -H, tickOpts);
 addLabel(`${TAU_MAX}y`, H + 0.7, -0.5, H, tickOpts);
 // IV ticks (Y)
 addLabel(`${Math.round(IV_LO * 100)}%`, -H - 0.5, 0, -H, tickOpts);
-addLabel(`${Math.round(IV_HI * 100)}%`, -H - 0.5, cageTop, -H, tickOpts);
+addLabel(`${Math.round(IV_HI * 100)}%`, -H - 0.5, Y_MAX, -H, tickOpts);
 
 // ===========================================================================
 // loop + resize
