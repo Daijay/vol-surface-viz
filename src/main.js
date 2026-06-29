@@ -321,9 +321,9 @@ window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// Escape toggles fullscreen on/off
+// "F" toggles fullscreen on/off
 window.addEventListener("keydown", (e) => {
-  if (e.key !== "Escape") return;
+  if (e.key !== "f" && e.key !== "F") return;
   e.preventDefault();
   if (document.fullscreenElement) {
     document.exitFullscreen();
