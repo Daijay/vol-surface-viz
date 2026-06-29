@@ -107,7 +107,7 @@ controls.target.set(0, 0, 0);
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.autoRotate = true;
-controls.autoRotateSpeed = 0.5;     // subtle, slow
+controls.autoRotateSpeed = -1.0;    // negative = clockwise, slow and subtle
 controls.minDistance = 9;
 controls.maxDistance = 40;
 // stop the auto-rotation the moment the user grabs it
