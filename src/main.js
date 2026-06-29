@@ -162,37 +162,56 @@ root.add(surfaceGrid);
 // scaffold cage: only thin white grid lines, empty/transparent between them
 // (open-top box of gridded faces floating in black space)
 // ===========================================================================
-function buildScaffold(x0, x1, y0, y1, z0, z1, divs) {
+const cageMat = new THREE.LineBasicMaterial({
+  color: 0xffffff, transparent: true, opacity: 0.14,
+});
+// one gridded face spanned by U and V vectors, anchored at (ox,oy,oz)
+function gridFace(ox, oy, oz, ux, uy, uz, vx, vy, vz, divs) {
   const verts = [];
   const t = [];
   for (let i = 0; i <= divs; i++) t.push(i / divs);
-  const add = (ox, oy, oz, ux, uy, uz, vx, vy, vz) => {
-    // grid on a face spanned by U (len in u*) and V vectors
-    for (const a of t) {
-      verts.push(ox + ux * a, oy + uy * a, oz + uz * a);
-      verts.push(ox + ux * a + vx, oy + uy * a + vy, oz + uz * a + vz);
-    }
-    for (const b of t) {
-      verts.push(ox + vx * b, oy + vy * b, oz + vz * b);
-      verts.push(ox + vx * b + ux, oy + vy * b + uy, oz + vz * b + uz);
-    }
-  };
-  const dx = x1 - x0, dy = y1 - y0, dz = z1 - z0;
-  add(x0, y0, z0, dx, 0, 0, 0, 0, dz);   // bottom
-  add(x0, y0, z0, dx, 0, 0, 0, dy, 0);   // front  (z = z0)
-  add(x0, y0, z1, dx, 0, 0, 0, dy, 0);   // back   (z = z1)
-  add(x0, y0, z0, 0, 0, dz, 0, dy, 0);   // left   (x = x0)
-  add(x1, y0, z0, 0, 0, dz, 0, dy, 0);   // right  (x = x1)
+  for (const a of t) {
+    verts.push(ox + ux * a, oy + uy * a, oz + uz * a);
+    verts.push(ox + ux * a + vx, oy + uy * a + vy, oz + uz * a + vz);
+  }
+  for (const b of t) {
+    verts.push(ox + vx * b, oy + vy * b, oz + vz * b);
+    verts.push(ox + vx * b + ux, oy + vy * b + uy, oz + vz * b + uz);
+  }
   const g = new THREE.BufferGeometry();
   g.setAttribute("position", new THREE.Float32BufferAttribute(verts, 3));
-  return new THREE.LineSegments(
-    g,
-    new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.14 })
-  );
+  return new THREE.LineSegments(g, cageMat);
 }
+
 const H = SIZE / 2;
 const cageTop = CAGE_TOP;           // taller scaffold, lots of grid headroom
-root.add(buildScaffold(-H, H, 0, cageTop, -H, H, 9));
+const DIV = 9;
+
+// floor is always visible
+root.add(gridFace(-H, 0, -H, 2 * H, 0, 0, 0, 0, 2 * H, DIV));
+
+// the four vertical walls, tracked so the two nearest the camera can be hidden
+const walls = [];
+function addWall(face, nx, nz) {
+  face.userData.normal = new THREE.Vector3(nx, 0, nz);          // outward normal
+  face.userData.center = new THREE.Vector3(0, cageTop / 2, 0)   // world center
+    .add(root.position).addScaledVector(face.userData.normal, H);
+  walls.push(face);
+  root.add(face);
+}
+addWall(gridFace(-H, 0, -H, 2 * H, 0, 0, 0, cageTop, 0, DIV), 0, -1); // front z=-H
+addWall(gridFace(-H, 0,  H, 2 * H, 0, 0, 0, cageTop, 0, DIV), 0,  1); // back  z=+H
+addWall(gridFace(-H, 0, -H, 0, 0, 2 * H, 0, cageTop, 0, DIV), -1, 0); // left  x=-H
+addWall(gridFace( H, 0, -H, 0, 0, 2 * H, 0, cageTop, 0, DIV),  1, 0); // right x=+H
+
+const _camRel = new THREE.Vector3();
+function updateWalls() {
+  for (const w of walls) {
+    _camRel.copy(camera.position).sub(w.userData.center);
+    // hide a wall when the camera is on its outer side (nearest walls)
+    w.visible = _camRel.dot(w.userData.normal) < 0;
+  }
+}
 
 // ===========================================================================
 // floating market data points (glowing dots at realistic coordinates)
@@ -291,6 +310,7 @@ addLabel(`${Math.round(IV_HI * 100)}%`, -H - 0.5, Y_MAX, -H, tickOpts);
 function animate() {
   requestAnimationFrame(animate);
   controls.update();
+  updateWalls();
   renderer.render(scene, camera);
 }
 animate();
